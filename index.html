@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <title>Spy Ultra: Chaos Theory</title>
+  <link rel="icon" type="image/png" href="Icon.PNG">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Exo+2:wght@400;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="crt-effect">
+
+  <!-- ═══════════════════════════════════════════════
+       LOADER — Биометрическое сканирование
+  ═══════════════════════════════════════════════ -->
+  <div id="screen-loader" class="screen active">
+    <div class="loader-inner">
+      <div class="scan-container">
+        <div class="scan-face">
+          <div class="scan-ring ring-1"></div>
+          <div class="scan-ring ring-2"></div>
+          <div class="scan-ring ring-3"></div>
+          <div class="scan-crosshair top-left"></div>
+          <div class="scan-crosshair top-right"></div>
+          <div class="scan-crosshair bot-left"></div>
+          <div class="scan-crosshair bot-right"></div>
+          <div class="scan-line"></div>
+          <div class="scan-icon">👁</div>
+        </div>
+      </div>
+      <div class="loader-title glitch" data-text="SPY ULTRA">SPY ULTRA</div>
+      <div class="loader-subtitle">CHAOS THEORY : EVOLUTION</div>
+      <div class="loader-status" id="loader-status">ИНИЦИАЛИЗАЦИЯ СИСТЕМЫ...</div>
+      <div class="loader-bar-wrap">
+        <div class="loader-bar" id="loader-bar"></div>
+      </div>
+      <div class="loader-log" id="loader-log"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       MAIN MENU — Главное меню
+  ═══════════════════════════════════════════════ -->
+  <div id="screen-menu" class="screen">
+    <header class="menu-header">
+      <div class="menu-logo">
+        <span class="logo-spy">SPY</span>
+        <span class="logo-ultra">ULTRA</span>
+      </div>
+      <div class="menu-version">v6.0 EVOLUTION</div>
+    </header>
+
+    <!-- Вкладки -->
+    <nav class="tabs" id="menu-tabs">
+      <button class="tab-btn active" data-tab="tab-game">МИССИЯ</button>
+      <button class="tab-btn" data-tab="tab-arsenal">💰</button>
+      <button class="tab-btn" data-tab="tab-agents">АГЕНТЫ</button>
+      <button class="tab-btn" data-tab="tab-worlds">МИРЫ</button>
+      <button class="tab-btn" data-tab="tab-roles">РОЛИ</button>
+      <button class="tab-btn" data-tab="tab-stats">ТОП</button>
+      <button class="tab-btn" data-tab="tab-prompts">📝</button>
+      <button class="tab-btn" data-tab="tab-settings">⚙</button>
+      <button class="tab-btn tab-dev" id="btn-open-dev" title="Конструктор">🔧</button>
+    </nav>
+
+    <!-- TAB: Игра -->
+    <div class="tab-content active" id="tab-game">
+      <div class="card">
+        <div class="card-title">⚙ ПАРАМЕТРЫ МИССИИ</div>
+        <label class="field-label">Количество шпионов</label>
+        <select id="cfg-spies" class="su-select">
+          <option value="1">1 ШПИОН</option>
+          <option value="2">2 ШПИОНА</option>
+          <option value="3">3 ШПИОНА</option>
+        </select>
+        <div class="toggle-row">
+          <span>Режим Chaos Theory (22 роли)</span>
+          <label class="toggle"><input type="checkbox" id="cfg-chaos" /><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span>Мини-голосования (каждые 2 мин)</span>
+          <label class="toggle"><input type="checkbox" id="cfg-minivote" checked /><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span>Система улик</span>
+          <label class="toggle"><input type="checkbox" id="cfg-evidence" checked /><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span>Глобальные аномалии</span>
+          <label class="toggle"><input type="checkbox" id="cfg-anomaly" /><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🎮 РЕЖИМ ИГРЫ</div>
+        <div id="mode-list"></div>
+      <div id="chaos-role-picker-card" class="card hidden">
+        <div class="card-title">⚡ ТЕОРИЯ ХАОСА — ВЫБОР РОЛЕЙ</div>
+        <p class="hint-text">Отметьте роли для раздачи в этом раунде.</p>
+        <div class="btn-row" style="margin-bottom:8px">
+          <button type="button" class="btn-sm btn-sec" id="chaos-roles-all">Все</button>
+          <button type="button" class="btn-sm btn-sec" id="chaos-roles-none">Снять</button>
+        </div>
+        <div id="chaos-role-checkboxes" class="role-check-grid"></div>
+      </div>
+
+      </div>
+
+      <div class="card">
+        <div class="card-title">🌐 ЛОКАЦИИ (ТЕМЫ)</div>
+        <div id="theme-chips" class="chips-wrap"></div>
+      </div>
+
+      <button class="btn-primary btn-large" id="btn-start">▶ НАЧАТЬ МИССИЮ</button>
+
+      <!-- Скрытые триггеры панелей -->
+      <div class="secret-trigger" id="trig-admin" data-panel="admin">OVERLORD.v6</div>
+      <div class="secret-trigger" id="trig-shadow" data-panel="shadow">SHADOW.v6</div>
+      <div class="secret-trigger" id="trig-root" data-panel="root">ZERO.ACCESS</div>
+    </div>
+
+
+    <!-- TAB: Арсенал -->
+    <div class="tab-content" id="tab-arsenal">
+      <div class="card">
+        <div class="card-title">💰 АРСЕНАЛ</div>
+        <p class="hint-text">Покупки за XP выбранного агента.</p>
+        <label class="field-label">Агент</label>
+        <select class="su-select" id="arsenal-player"></select>
+        <div class="arsenal-balance" id="arsenal-balance">Баланс: 0 XP</div>
+        <div id="arsenal-shop" class="shop-grid"></div>
+      </div>
+    </div>
+    <!-- TAB: Агенты -->
+    <div class="tab-content" id="tab-agents">
+      <div class="card">
+        <div class="card-title">👤 АГЕНТЫ</div>
+        <div id="agent-list"></div>
+        <div class="btn-row">
+          <button class="btn-sec" id="btn-add-agent">+ АГЕНТ</button>
+          <button class="btn-danger btn-sm" id="btn-reset-xp">СБРОС XP</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🏰 КЛАНЫ</div>
+        <div id="clan-list"></div>
+        <input type="text" class="su-input" id="clan-input" placeholder="Название клана..." />
+        <button class="btn-sec" id="btn-add-clan">Создать клан</button>
+      </div>
+    </div>
+
+    <!-- TAB: Миры (Темы) -->
+    <div class="tab-content" id="tab-worlds">
+      <div class="card">
+        <div class="card-title">🌐 НОВАЯ ЛОКАЦИЯ</div>
+        <input type="text" class="su-input" id="new-theme-name" placeholder="Название локации" />
+        <textarea class="su-textarea" id="new-theme-words" placeholder="Слова через запятую (мин. 5)..."></textarea>
+        <button class="btn-primary" id="btn-save-theme">Создать локацию</button>
+      </div>
+      <div id="theme-edit-list"></div>
+    </div>
+
+    <!-- TAB: Роли -->
+    <div class="tab-content" id="tab-roles">
+      <div class="card">
+        <div class="card-title">🎭 CHAOS THEORY — 22 РОЛИ</div>
+        <p class="hint-text">Роли выдаются случайно в режиме Chaos Theory. Прокачка через XP.</p>
+        <div id="roles-showcase"></div>
+      <div class="card">
+        <div class="card-title">✅ АКТИВНЫЕ РОЛИ (CHAOS)</div>
+        <div id="roles-active-grid" class="role-check-grid"></div>
+      </div>
+
+      </div>
+    </div>
+
+    <!-- TAB: Статистика -->
+    <div class="tab-content" id="tab-stats">
+      <div class="card"><div class="card-title">🏆 ТАБЛИЦА XP</div><div id="stat-list"></div></div>
+      <div class="card"><div class="card-title">🎖 ДОСТИЖЕНИЯ</div><div id="ach-grid" class="ach-grid"></div></div>
+      <div class="card"><div class="card-title">❤ РЕПУТАЦИЯ</div><div id="rep-list"></div></div>
+      <div class="card"><div class="card-title">📜 ИСТОРИЯ РАУНДОВ</div><div id="hist-list"></div></div>
+    </div>
+
+
+    <!-- TAB: Промпты -->
+    <div class="tab-content" id="tab-prompts">
+      <div class="card prompts-hero-card">
+        <div class="card-title">📝 ШАБЛОНЫ ПРОМПТОВ</div>
+        <p class="hint-text">Готовые запросы для ИИ. Нажмите «Копировать» и вставьте в чат.</p>
+      </div>
+      <div id="prompts-root" class="prompts-root"></div>
+    </div>
+    <!-- TAB: Настройки -->
+    <div class="tab-content" id="tab-settings">
+      <div class="card">
+        <div class="card-title">🎨 ТЕМА ОФОРМЛЕНИЯ</div>
+        <div id="theme-btns" class="btn-row wrap"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">💾 ДАННЫЕ (БЕЗ ФОТО)</div>
+        <button class="btn-sec" id="btn-export">📋 Экспорт (~3кб)</button>
+        <textarea class="su-textarea" id="import-box" placeholder="Вставьте данные для импорта..."></textarea>
+        <button class="btn-primary" id="btn-import">📥 Импорт</button>
+      </div>
+      <div class="card">
+        <div class="card-title">📤 ТЕМЫ JSON</div>
+        <button class="btn-sec" id="btn-export-themes">📋 Экспорт локаций</button>
+        <textarea class="su-textarea" id="theme-import-box" placeholder='[{"name":"Тема","words":["слово"]}]'></textarea>
+        <button class="btn-primary" id="btn-import-themes">📥 Импорт локаций</button>
+      </div>
+      <div class="card">
+        <div class="card-title">📸 ФОТО (ОТДЕЛЬНО)</div>
+        <button class="btn-sec" id="btn-export-photos">📋 Экспорт фото</button>
+        <textarea class="su-textarea" id="photo-import-box" placeholder="Фото-данные base64..."></textarea>
+        <button class="btn-sec" id="btn-import-photos">📥 Импорт фото</button>
+      </div>
+      <!-- Quick-Chat -->
+      <div class="card">
+        <div class="card-title">💬 БЫСТРЫЕ ФРАЗЫ</div>
+        <div id="quick-chat-panel"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       GAME BOARD — Основной экран игры
+  ═══════════════════════════════════════════════ -->
+  <div id="screen-game" class="screen">
+
+    <!-- Верхняя панель -->
+    <div class="game-topbar">
+      <div class="game-badge" id="round-badge"></div>
+      <div class="game-badge" id="mode-badge"></div>
+      <div class="game-badge" id="veto-badge" style="display:none">⭐ ВЕТО: <span id="veto-count">3</span></div>
+    </div>
+
+    <!-- Open Admin bar (видимая всем) -->
+    <div id="open-admin-bar">
+      <div id="open-admin-handle">
+        <span>⚡ УПРАВЛЕНИЕ</span>
+        <span id="open-admin-arrow">▲</span>
+      </div>
+      <div id="open-admin-body">
+        <div class="btn-grid-3">
+          <button class="btn-sm btn-sec" id="oadm-timer">⏱ Тайм.</button>
+          <button class="btn-sm btn-sec" id="oadm-addtime">+1 мин</button>
+          <button class="btn-sm btn-sec" id="oadm-announce">📢 Объяв.</button>
+          <button class="btn-sm btn-sec" id="oadm-hint">💡 Буква</button>
+          <button class="btn-sm btn-sec" id="oadm-top">🏆 Топ</button>
+          <button class="btn-sm btn-neon3" id="oadm-anomaly">⚡ Аном.</button>
+        </div>
+        <input type="text" class="su-input" id="oadm-msg-input" placeholder="Объявление..." />
+      </div>
+    </div>
+
+    <!-- Log Console -->
+    <div id="log-console" class="log-console hidden">
+      <div class="log-header">
+        <span>TERMINAL</span>
+        <button class="btn-sm btn-sec" id="log-close">✕</button>
+      </div>
+      <div id="log-output"></div>
+    </div>
+
+    <!-- Anti-AFK overlay -->
+    <div id="afk-overlay" class="afk-overlay hidden">
+      <div class="afk-text">AFK DETECTED<br><span style="font-size:14px">НАЖМИ ДЛЯ ПРОДОЛЖЕНИЯ</span></div>
+    </div>
+
+    <!-- СТАДИЯ: Передача телефона -->
+    <div class="game-stage" id="stage-pass">
+      <div class="stage-label">ПЕРЕДАЙ ТЕЛЕФОН</div>
+      <div class="pass-avatar" id="pass-avatar"></div>
+      <div class="pass-name" id="pass-name"></div>
+      <div class="pass-tier" id="pass-tier"></div>
+      <button class="btn-primary btn-large" id="btn-open-role">◉ ОТКРЫТЬ РОЛЬ</button>
+    </div>
+
+    <!-- СТАДИЯ: Показ роли -->
+    <div class="game-stage hidden" id="stage-role">
+      <div id="role-card-container"></div>
+      <div id="evidence-container"></div>
+      <div id="ability-buttons-container"></div>
+      <div id="psych-task-container"></div>
+      <button class="btn-primary" id="btn-next-player">Я ЗАПОМНИЛ →</button>
+    </div>
+
+    <!-- СТАДИЯ: Обсуждение -->
+    <div class="game-stage hidden" id="stage-discuss">
+      <div class="discuss-icon">🗣</div>
+      <h2 class="stage-h2">ОБСУЖДЕНИЕ</h2>
+      <p class="stage-hint" id="discuss-hint"></p>
+
+      <div id="anomaly-banner" class="anomaly-banner hidden"></div>
+      <div id="minivote-warning" class="minivote-warn hidden"></div>
+
+      <!-- Таймер — 5 тапов = Zero Panel -->
+      <div class="timer-wrap" id="timer-wrap">
+        <svg class="timer-ring" viewBox="0 0 100 100" id="timer-svg">
+          <circle class="timer-bg" cx="50" cy="50" r="42"/>
+          <circle class="timer-arc" cx="50" cy="50" r="42" id="timer-arc"/>
+        </svg>
+        <div class="timer-num" id="timer-num">2:00</div>
+        <div class="timer-tap-count" id="timer-tap-count"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-sm btn-sec" id="btn-timer-toggle">▶</button>
+        <button class="btn-sm btn-sec" id="btn-timer-reset">↺</button>
+        <button class="btn-sm btn-sec" id="btn-new-question">❓</button>
+        <button class="btn-sm btn-neon3" id="btn-trigger-anomaly">⚡</button>
+      </div>
+
+      <div id="question-box" class="question-box hidden"></div>
+      <div id="analyst-log" class="analyst-log hidden"></div>
+
+      <button class="btn-danger btn-large" id="btn-go-vote">К ГОЛОСОВАНИЮ ➜</button>
+    </div>
+
+    <!-- СТАДИЯ: Мини-голосование (Interim) -->
+    <div class="game-stage hidden" id="stage-minivote">
+      <div class="minivote-header">⚖ МИНИ-ГОЛОСОВАНИЕ <span id="mv-round-num">1</span></div>
+      <p class="stage-hint">Вес голоса: 0.5</p>
+      <p class="stage-hint" id="mv-voter-label"></p>
+      <div id="mv-grid"></div>
+      <button class="btn-gold" id="btn-mv-confirm">✓ ПОДТВЕРДИТЬ</button>
+      <button class="btn-sec" id="btn-mv-skip">Пропустить</button>
+    </div>
+
+    <!-- СТАДИЯ: Передача для голосования -->
+    <div class="game-stage hidden" id="stage-vote-pass">
+      <div class="stage-label">ГОЛОСУЕТ</div>
+      <div class="pass-name" id="vote-voter-name"></div>
+      <p class="stage-hint">Передай телефон этому игроку</p>
+      <button class="btn-danger btn-large" id="btn-start-vote">🗳 ГОЛОСОВАТЬ</button>
+    </div>
+
+    <!-- СТАДИЯ: Голосование -->
+    <div class="game-stage hidden" id="stage-vote">
+      <h2 class="stage-h2 red-text">⚡ ГОЛОСОВАНИЕ</h2>
+      <p class="stage-hint" id="vote-voter-label"></p>
+      <div id="vote-grid"></div>
+      <button class="btn-danger" id="btn-confirm-vote">✓ ПОДТВЕРДИТЬ</button>
+    </div>
+
+    <!-- СТАДИЯ: Ничья -->
+    <div class="game-stage hidden" id="stage-tie">
+      <div class="big-emoji">⚖️</div>
+      <h2 class="stage-h2 gold-text">НИЧЬЯ!</h2>
+      <p class="stage-hint" id="tie-names-text"></p>
+      <button class="btn-danger" id="btn-revote">🔄 Переголосование</button>
+      <button class="btn-gold" id="btn-mayor-decide">👑 Решение Мэра</button>
+      <button class="btn-sec" id="btn-tie-random">🎲 Случайный</button>
+    </div>
+
+    <!-- СТАДИЯ: Последний шанс / Викторина -->
+    <div class="game-stage hidden" id="stage-lc">
+      <div class="big-emoji">🎯</div>
+      <h2 class="stage-h2 red-text" id="lc-title">ПОСЛЕДНИЙ ШАНС</h2>
+      <p class="stage-hint" id="lc-desc"></p>
+      <div id="lc-content"></div>
+    </div>
+
+    <!-- СТАДИЯ: Дуэль -->
+    <div class="game-stage hidden" id="stage-duel">
+      <div class="big-emoji">⚔️</div>
+      <h2 class="stage-h2 red-text">ДУЭЛЬ</h2>
+      <p class="stage-hint" id="duel-desc"></p>
+      <div id="duel-grid"></div>
+      <button class="btn-danger" id="btn-end-duel">Завершить дуэль</button>
+    </div>
+
+    <!-- СТАДИЯ: Результаты -->
+    <div class="game-stage hidden" id="stage-results">
+      <div id="result-banner"></div>
+      <div id="result-list"></div>
+      <div class="btn-row">
+        <button class="btn-sec" id="btn-to-menu">↩ Меню</button>
+        <button class="btn-primary" id="btn-rematch">🔄 Реванш</button>
+      </div>
+    </div>
+
+    <!-- Death Screen overlay -->
+    <div id="death-screen" class="death-screen hidden">
+      <div class="death-glass"></div>
+      <div class="death-text">SIGNAL LOST</div>
+      <div class="death-name" id="death-player-name"></div>
+    </div>
+
+    <!-- Agent 007 intercept overlay -->
+    <div id="agent007-overlay" class="agent007-overlay hidden">
+      <div class="agent007-title">🔫 АГЕНТ 007</div>
+      <div class="agent007-timer" id="agent007-countdown">3</div>
+      <button class="btn-danger btn-large" id="btn-007-intercept">ПЕРЕХВАТИТЬ!</button>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       PANIC UI — Маскировка (учебник биологии)
+  ═══════════════════════════════════════════════ -->
+  <div id="screen-panic" class="screen">
+    <div class="panic-content">
+      <h1 class="panic-title">📚 Биология 9 класс</h1>
+      <h2>Глава 4: Клетка как система</h2>
+      <p>Клетка — основная структурная и функциональная единица жизни. Все живые организмы состоят из клеток, которые обладают обменом веществ, способностью к росту и размножению.</p>
+      <h3>4.1 Строение клетки</h3>
+      <p>Клеточная мембрана осуществляет избирательную проницаемость. Ядро содержит генетическую информацию в виде ДНК. Митохондрии обеспечивают клетку энергией путём клеточного дыхания.</p>
+      <div class="panic-table">
+        <table>
+          <tr><th>Органоид</th><th>Функция</th></tr>
+          <tr><td>Ядро</td><td>Хранение ДНК</td></tr>
+          <tr><td>Митохондрия</td><td>Синтез АТФ</td></tr>
+          <tr><td>Рибосома</td><td>Синтез белка</td></tr>
+          <tr><td>Хлоропласт</td><td>Фотосинтез</td></tr>
+        </table>
+      </div>
+      <p class="panic-footer">Нажмите ESC дважды для возврата к игре</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       ZERO PANEL — Скрытая ROOT панель
+  ═══════════════════════════════════════════════ -->
+  <div id="screen-zero" class="screen">
+    <div class="zero-header">
+      <div class="zero-title">⚡ ZERO ACCESS</div>
+      <div class="zero-sub">ROOT TERMINAL v6.0 — ТОЛЬКО ДЛЯ РАЗРАБОТЧИКА</div>
+    </div>
+    <div class="zero-log" id="zero-log">> Система авторизована. Ожидание команды...</div>
+    <div class="btn-grid-2">
+      <button class="btn-root" id="zero-spy-vision">👁 Spy-Vision</button>
+      <button class="btn-root" id="zero-stealth-vote">🗳 Stealth x3</button>
+      <button class="btn-danger" id="zero-emergency-clean">🧹 Emergency Clean</button>
+      <button class="btn-danger" id="zero-master-reset">🔄 Master Reset</button>
+      <button class="btn-root" id="zero-level-master-btn">📈 Level Master</button>
+      <button class="btn-root" id="zero-inject-artifact-btn">💉 Inject Artifact</button>
+      <button class="btn-root" id="zero-log-console-btn">📋 Log Console</button>
+      <button class="btn-root" id="zero-kill-player-btn">💀 Kill Player</button>
+    </div>
+    <div id="zero-level-panel" class="zero-sub-panel hidden">
+      <label class="field-label">LEVEL MASTER</label>
+      <select class="su-select" id="zero-lm-player"></select>
+      <select class="su-select" id="zero-lm-tier">
+        <option value="1">Tier 1 — Base</option>
+        <option value="2">Tier 2 — Advanced</option>
+        <option value="3">Tier 3 — Master</option>
+      </select>
+      <button class="btn-root" id="zero-apply-level">Применить Tier</button>
+    </div>
+    <div id="zero-artifact-panel" class="zero-sub-panel hidden">
+      <label class="field-label">INJECT ARTIFACT</label>
+      <select class="su-select" id="zero-art-player"></select>
+      <select class="su-select" id="zero-art-type">
+        <option value="voteBoost">+3 вес голоса</option>
+        <option value="xpBoost">+50 XP сейчас</option>
+        <option value="immunity">Иммунитет раунда</option>
+        <option value="revealRole">Раскрыть роль всем</option>
+      </select>
+      <button class="btn-root" id="zero-apply-artifact">Вбросить</button>
+    </div>
+    <div id="zero-kill-panel" class="zero-sub-panel hidden">
+      <label class="field-label">KILL PLAYER</label>
+      <select class="su-select" id="zero-kill-player"></select>
+      <button class="btn-danger" id="zero-apply-kill">Устранить игрока</button>
+    </div>
+    <button class="btn-sec" id="zero-close">✖ ВЫЙТИ ИЗ ТЕРМИНАЛА</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       ADMIN PANEL — Открытая (видна гостям)
+  ═══════════════════════════════════════════════ -->
+  <div id="screen-admin" class="screen">
+    <div class="panel-header green-text">⚡ УПРАВЛЕНИЕ ИГРОЙ</div>
+    <div id="admin-content">
+      <div class="panel-section"><span class="albl">⏱ Таймер</span>
+        <div class="btn-row"><button class="btn-sec" id="adm-timer-toggle">▶/⏸</button><button class="btn-sec" id="adm-addtime">+1 мин</button></div>
+      </div>
+      <div class="panel-section"><span class="albl">📢 Объявление</span>
+        <input type="text" class="su-input" id="adm-announce-input" placeholder="Текст объявления..." />
+        <button class="btn-primary" id="adm-announce-send">Показать всем</button>
+      </div>
+      <div class="panel-section"><span class="albl">💡 Подсказка (первая буква)</span>
+        <button class="btn-sec" id="adm-hint-btn">Показать подсказку</button>
+      </div>
+      <div class="panel-section"><span class="albl">🏆 ТОП-3</span>
+        <button class="btn-sec" id="adm-top-btn">Показать рейтинг</button>
+      </div>
+      <div class="panel-section"><span class="albl">🎲 Случайное событие</span>
+        <button class="btn-sec" id="adm-random-event">Активировать</button>
+      </div>
+      <div class="panel-section"><span class="albl">🎨 Смена темы</span>
+        <div id="adm-theme-btns" class="btn-grid-2"></div>
+      </div>
+
+      <div class="panel-section dev-injector-section">
+        <span class="albl">💉 Инжектор плагинов ядра</span>
+        <textarea class="su-textarea" id="adm-inject-code" placeholder="JS или CSS для внедрения на страницу..."></textarea>
+        <div class="btn-row">
+          <button class="btn-neon3" id="adm-inject-run">▶ Выполнить</button>
+          <button class="btn-sec" id="adm-inject-save">💾 Сохранить</button>
+        </div>
+      </div>
+
+      <div class="panel-section anim-settings-section">
+        <span class="albl">🎬 АНИМАЦИИ ИНТЕРФЕЙСА</span>
+        <div class="toggle-row neon-toggle-row">
+          <span>Неоновые анимации</span>
+          <label class="toggle toggle-neon"><input type="checkbox" id="anim-enabled-toggle" checked /><span class="toggle-slider"></span></label>
+        </div>
+        <label class="field-label">Скорость: <span id="anim-speed-val">25%</span></label>
+        <input type="range" id="anim-speed-slider" class="neon-range" min="0.1" max="1" step="0.05" value="0.25" />
+      </div>
+      <div class="panel-section"><span class="albl">🏁 Победитель вручную</span>
+        <div class="btn-row">
+          <button class="btn-primary" id="adm-civil-win">Мирные победили</button>
+          <button class="btn-danger" id="adm-spy-win">Шпион победил</button>
+        </div>
+      </div>
+    </div>
+    <button class="btn-sec" id="adm-close">✖ ЗАКРЫТЬ</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       SHADOW PANEL — Скрытая (только для тебя)
+  ═══════════════════════════════════════════════ -->
+  <div id="screen-shadow" class="screen">
+    <div class="panel-header red-text">🔒 SHADOW ADMIN</div>
+    <div id="shadow-content">
+      <div class="panel-section"><span class="albl">🎯 Назначить шпиона</span><select class="su-select" id="sh-spy"></select></div>
+      <div class="panel-section"><span class="albl">🔄 Поменять слово</span>
+        <input type="text" class="su-input" id="sh-word-input" placeholder="Новое слово..." />
+        <button class="btn-danger" id="sh-swap-word">Сменить</button>
+      </div>
+      <div class="panel-section"><span class="albl">💬 Ложная подсказка</span>
+        <select class="su-select" id="sh-fclue-player"></select>
+        <input type="text" class="su-input" id="sh-fclue-text" placeholder="Ложный текст..." />
+        <button class="btn-danger" id="sh-send-fclue">Отправить</button>
+      </div>
+      <div class="panel-section"><span class="albl">🚫 Заблокировать голос</span><select class="su-select" id="sh-block-vote"></select></div>
+      <div class="panel-section"><span class="albl">🛡 Иммунитет к голосованию</span><select class="su-select" id="sh-immune"></select></div>
+      <div class="panel-section"><span class="albl">✌️ Двойной голос</span><select class="su-select" id="sh-double-vote"></select></div>
+      <div class="panel-section">
+        <div class="toggle-row"><span>Анонимное голосование</span><label class="toggle"><input type="checkbox" id="sh-anon-vote" /><span class="toggle-slider"></span></label></div>
+      </div>
+      <div class="panel-section"><span class="albl">👁 Галлюцинация для одного</span>
+        <select class="su-select" id="sh-hall-player"></select>
+        <input type="text" class="su-input" id="sh-hall-text" value="ТЫ ШПИОН!" />
+        <button class="btn-danger" id="sh-send-hall">Показать</button>
+      </div>
+      <div class="panel-section"><span class="albl">🔄 Сменить роль</span>
+        <select class="su-select" id="sh-role-player"></select>
+        <select class="su-select" id="sh-role-type">
+          <option value="civil">Мирный</option><option value="spy">Шпион</option>
+          <option value="traitor">Предатель</option><option value="detective">Детектив</option>
+        </select>
+        <button class="btn-danger" id="sh-apply-role">Сменить роль</button>
+      </div>
+      <div class="panel-section">
+        <div class="toggle-row"><span>Заморозить таймер</span><label class="toggle"><input type="checkbox" id="sh-freeze-timer" /><span class="toggle-slider"></span></label></div>
+      </div>
+      <div class="panel-section"><span class="albl">💰 Изменить XP</span>
+        <select class="su-select" id="sh-xp-player"></select>
+        <input type="number" class="su-input" id="sh-xp-amount" placeholder="±XP (напр: 50 или -10)" />
+        <button class="btn-gold" id="sh-apply-xp">Применить</button>
+      </div>
+      <div class="panel-section"><span class="albl">💥 Хаос прямо сейчас</span>
+        <button class="btn-danger" id="sh-chaos-now">Переназначить роли!</button>
+      </div>
+      <div class="panel-section"><span class="albl">📡 Системное сообщение</span>
+        <input type="text" class="su-input" id="sh-sysmsg" placeholder="Сообщение от СИСТЕМЫ..." />
+        <button class="btn-sec" id="sh-send-sysmsg">Отправить</button>
+      </div>
+      <div class="panel-section"><span class="albl">🔍 Все роли раунда</span>
+        <button class="btn-sec" id="sh-view-roles">Показать</button>
+        <div id="sh-roles-view"></div>
+      </div>
+      <div class="panel-section"><span class="albl">♻️ Передать роль шпиона</span>
+        <select class="su-select" id="sh-swap-from"></select>
+        <select class="su-select" id="sh-swap-to"></select>
+        <button class="btn-danger" id="sh-apply-swap">Передать</button>
+      </div>
+      <div class="panel-section"><span class="albl">⚡ Активировать аномалию</span>
+        <select class="su-select" id="sh-anomaly-type">
+          <option value="groundhog">День сурка</option>
+          <option value="matrix">Сбой матрицы</option>
+          <option value="silent">Тихий час</option>
+          <option value="amnesia">Амнезия</option>
+          <option value="broken">Сломанный тлф</option>
+          <option value="blitz">Блиц x2</option>
+        </select>
+        <button class="btn-neon3" id="sh-trigger-anomaly">Активировать</button>
+      </div>
+      <div class="panel-section"><span class="albl">🌀 Спец-режим</span>
+        <select class="su-select" id="sh-chaos-mode">
+          <option value="normal">Обычный</option>
+          <option value="chaos">Хаос 33%</option>
+          <option value="paranoia">Паранойя (все шпионы)</option>
+          <option value="peaceful">Мирный день</option>
+          <option value="custom">Кастомный %</option>
+        </select>
+        <div id="sh-custom-chance-wrap" style="display:none">
+          <label class="field-label">Шанс: <span id="sh-chance-val">30</span>%</label>
+          <input type="range" id="sh-custom-chance" min="0" max="100" value="30" />
+        </div>
+      </div>
+      <div class="panel-section"><span class="albl">⭐ VIP статус</span>
+        <select class="su-select" id="sh-vip-player"></select>
+        <div class="btn-row">
+          <button class="btn-gold" id="sh-give-vip">⭐ Выдать</button>
+          <button class="btn-sec" id="sh-revoke-vip">✕ Снять</button>
+        </div>
+      </div>
+      <div class="panel-section"><span class="albl">🌙 Sleeper Agent</span>
+        <select class="su-select" id="sh-sleeper-player"></select>
+        <button class="btn-neon3" id="sh-apply-sleeper">Завербовать</button>
+      </div>
+    </div>
+    <button class="btn-sec" id="shadow-close">✖ ЗАКРЫТЬ</button>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       DEV CONSTRUCTOR — Панель разработчика
+  ═══════════════════════════════════════════════ -->
+  <div id="screen-dev" class="screen">
+    <div class="dev-header">
+      <div class="dev-title">🔧 КОНСТРУКТОР</div>
+      <button type="button" class="btn-sm btn-sec" id="dev-close">✖</button>
+    </div>
+    <nav class="dev-tabs" id="dev-tabs">
+      <button type="button" class="dev-tab active" data-dev="dev-themes">Темы</button>
+      <button type="button" class="dev-tab" data-dev="dev-fonts">Шрифты</button>
+      <button type="button" class="dev-tab" data-dev="dev-titles">Титулы</button>
+      <button type="button" class="dev-tab" data-dev="dev-ach">Ачивки</button>
+      <button type="button" class="dev-tab" data-dev="dev-plugins">Плагины</button>
+      <button type="button" class="dev-tab" data-dev="dev-vip">VIP</button>
+      <button type="button" class="dev-tab" data-dev="dev-modes">Режимы</button>
+      <button type="button" class="dev-tab" data-dev="dev-roles">Роли</button>
+    </nav>
+
+    <div class="dev-panel active" id="dev-themes">
+      <div class="card"><div class="card-title">🎨 Конструктор темы</div>
+        <div class="color-grid" id="theme-color-inputs"></div>
+        <label class="field-label">Кастомный фон (CSS)</label>
+        <textarea class="su-textarea" id="dev-bg-css" placeholder="background: linear-gradient(...);"></textarea>
+        <button type="button" class="btn-primary" id="dev-theme-apply">Применить тему</button>
+        <button type="button" class="btn-sec" id="dev-theme-reset">Сброс</button>
+      </div>
+    </div>
+
+    <div class="dev-panel" id="dev-fonts">
+      <div class="card"><div class="card-title">🔤 Шрифты Google</div>
+        <label class="field-label">URL CSS (fonts.googleapis.com)</label>
+        <input class="su-input" id="dev-font-url" placeholder="https://fonts.googleapis.com/css2?family=..." />
+        <label class="field-label">font-family</label>
+        <input class="su-input" id="dev-font-family" placeholder="'Orbitron', monospace" />
+        <button type="button" class="btn-primary" id="dev-font-apply">Подключить</button>
+      </div>
+    </div>
+
+    <div class="dev-panel" id="dev-titles">
+      <div class="card"><div class="card-title">🏅 Титулы</div>
+        <div id="dev-titles-list"></div>
+        <label class="field-label">Название</label><input class="su-input" id="dt-name" />
+        <label class="field-label">Эмодзи</label><input class="su-input" id="dt-emoji" />
+        <label class="field-label">Мин. XP</label><input type="number" class="su-input" id="dt-minxp" value="0" />
+        <label class="field-label">Условие (JS, return bool)</label>
+        <textarea class="su-textarea code-field" id="dt-cond" placeholder="return player.wins >= 10;"></textarea>
+        <button type="button" class="btn-primary" id="dt-add">Добавить титул</button>
+      </div>
+    </div>
+
+    <div class="dev-panel" id="dev-ach">
+      <div class="card"><div class="card-title">🎖 Ачивки</div>
+        <div id="dev-ach-list"></div>
+        <label class="field-label">Название</label><input class="su-input" id="da-name" />
+        <label class="field-label">Эмодзи</label><input class="su-input" id="da-emoji" />
+        <label class="field-label">Описание</label><input class="su-input" id="da-desc" />
+        <label class="field-label">Проверка (JS)</label>
+        <textarea class="su-textarea code-field" id="da-check" placeholder="return player.score >= 100;"></textarea>
+        <button type="button" class="btn-primary" id="da-add">Добавить ачивку</button>
+      </div>
+    </div>
+
+    <div class="dev-panel" id="dev-plugins">
+      <nav class="sub-tabs">
+        <button type="button" class="sub-tab active" data-ptab="plug-form">Форма</button>
+        <button type="button" class="sub-tab" data-ptab="plug-code">Код</button>
+        <button type="button" class="sub-tab" data-ptab="plug-mine">Мои</button>
+      </nav>
+      <div id="plug-form" class="sub-panel active">
+        <label class="field-label">Имя</label><input class="su-input" id="pl-name" />
+        <label class="field-label">Хук</label>
+        <select class="su-select" id="pl-hook">
+          <option value="onRoleReveal">onRoleReveal(p,g)</option>
+          <option value="onVote">onVote</option>
+          <option value="onRoundEnd">onRoundEnd</option>
+          <option value="onDiscuss">onDiscuss</option>
+          <option value="onPass">onPass</option>
+        </select>
+        <label class="field-label">Код fn(ctx)</label>
+        <textarea class="su-textarea code-field" id="pl-code" placeholder="showMsg('Привет');"></textarea>
+        <button type="button" class="btn-primary" id="pl-save">Сохранить плагин</button>
+      </div>
+      <div id="plug-code" class="sub-panel">
+        <textarea class="su-textarea code-field" id="pl-raw" rows="8" placeholder="export default { name, hook, fn }"></textarea>
+        <button type="button" class="btn-primary" id="pl-import-raw">Импорт из кода</button>
+      </div>
+      <div id="plug-mine" class="sub-panel">
+        <div id="plug-list"></div>
+        <div class="btn-row">
+          <button type="button" class="btn-sec" id="pl-export">📋 Экспорт JSON</button>
+          <button type="button" class="btn-sec" id="pl-import-btn">📥 Импорт JSON</button>
+        </div>
+        <textarea class="su-textarea" id="pl-import-box" placeholder="JSON плагинов..."></textarea>
+      </div>
+    </div>
+
+    <div class="dev-panel" id="dev-vip">
+      <div class="card"><div class="card-title">⭐ VIP логика</div>
+        <label class="field-label">Код (if player.vip) { ... }</label>
+        <textarea class="su-textarea code-field" id="vip-code" rows="6"></textarea>
+        <label class="field-label">Хук</label>
+        <select class="su-select" id="vip-hook">
+          <option value="onRoleReveal">onRoleReveal</option>
+          <option value="onDiscuss">onDiscuss</option>
+          <option value="onVote">onVote</option>
+        </select>
+        <button type="button" class="btn-primary" id="vip-save">Сохранить VIP</button>
+      </div>
+    </div>
+
+    <div class="dev-panel" id="dev-modes">
+      <div class="card"><div class="card-title">🎮 Редактор режимов</div>
+        <div id="dev-modes-list"></div>
+        <label class="field-label">ID (латиница)</label><input class="su-input" id="dm-id" />
+        <label class="field-label">Название</label><input class="su-input" id="dm-name" />
+        <label class="field-label">Эмодзи</label><input class="su-input" id="dm-emoji" />
+        <label class="field-label">Описание</label><input class="su-input" id="dm-desc" />
+        <label class="field-label">Шпионов по умолчанию</label><input type="number" class="su-input" id="dm-spies" value="1" min="1" max="3" />
+        <div class="toggle-row"><span>Chaos роли</span><label class="toggle"><input type="checkbox" id="dm-chaos" /><span class="toggle-slider"></span></label></div>
+        <div class="toggle-row"><span>Мини-голосования</span><label class="toggle"><input type="checkbox" id="dm-minivote" /><span class="toggle-slider"></span></label></div>
+        <label class="field-label">Кастомная логика (JS)</label>
+        <textarea class="su-textarea code-field" id="dm-logic" placeholder="return { spies: 2 };"></textarea>
+        <button type="button" class="btn-primary" id="dm-save">Сохранить режим</button>
+      </div>
+    </div>
+
+    <div class="dev-panel" id="dev-roles">
+      <div class="card"><div class="card-title">🎭 Кастомная роль</div>
+        <div id="dev-custom-roles-list"></div>
+        <label class="field-label">ID</label><input class="su-input" id="cr-id" />
+        <label class="field-label">Название</label><input class="su-input" id="cr-name" />
+        <label class="field-label">Эмодзи</label><input class="su-input" id="cr-emoji" />
+        <label class="field-label">Команда</label>
+        <select class="su-select" id="cr-team">
+          <option value="spy">Шпионы</option>
+          <option value="civil">Мирные</option>
+          <option value="solo">Одиночка</option>
+        </select>
+        <label class="field-label">Описание / цель</label><input class="su-input" id="cr-desc" />
+        <label class="field-label">JS действие (фазы)</label>
+        <textarea class="su-textarea code-field" id="cr-action" placeholder="// ctx: player, game, phase"></textarea>
+        <button type="button" class="btn-primary" id="cr-save">Создать роль</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Глобальные попапы -->
+  <div id="popup-container"></div>
+
+  <!-- Галлюцинация overlay -->
+  <div id="hallucination-layer" style="display:none;position:fixed;z-index:9997;pointer-events:none;font-weight:900;font-family:'Fira Code',monospace;text-shadow:2px 2px 12px rgba(0,0,0,.9);"></div>
+
+  <script src="script.js"></script>
+  <script src="su-panels.js"></script>
+  <script src="su-meta.js"></script>
+  <script src="su-prompts.js"></script>
+  <script src="su-animations.js"></script>
+</body>
+</html>
